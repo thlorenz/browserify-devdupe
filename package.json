@@ -16,13 +16,15 @@
   },
   "homepage": "https://github.com/thlorenz/browserify-dedupe",
   "dependencies": {
-    "deduper": "~0.3.0"
+    "deduper": "~0.3.0",
+    "through": "~2.3.4"
   },
   "devDependencies": {
     "nave": "~0.4.3",
     "tape": "~1.0.4",
     "tap": "~0.4.3",
-    "browserify": "~2.29.0"
+    "browserify": "~2.29.0",
+    "tap-stream": "~0.2.0"
   },
   "keywords": [],
   "author": {
