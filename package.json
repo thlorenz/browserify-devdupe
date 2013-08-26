@@ -23,8 +23,7 @@
     "nave": "~0.4.3",
     "tape": "~1.0.4",
     "tap": "~0.4.3",
-    "browserify": "~2.29.0",
-    "tap-stream": "~0.2.0"
+    "browserify": "~2.29.0"
   },
   "keywords": [],
   "author": {
