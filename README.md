@@ -1,4 +1,4 @@
-# browserify-dedupe [![build status](https://secure.travis-ci.org/thlorenz/browserify-dedupe.png)](http://travis-ci.org/thlorenz/browserify-dedupe)
+# browserify-devdupe [![build status](https://secure.travis-ci.org/thlorenz/browserify-devdupe.png)](http://travis-ci.org/thlorenz/browserify-devdupe)
 
 Dedupes packages included in a browserify bundle according to a given criteria.
 
@@ -7,16 +7,20 @@ Dedupes packages included in a browserify bundle according to a given criteria.
 Don't use this in production - hence the name - instead you should [`npm
 dedupe`](https://npmjs.org/doc/cli/npm-dedupe.html) your package and run the normal browserify instead.
 
-**browserify-dedupe** is solely in existance to solve one problem: `npm dedupe` does not work with linked sub modules. 
+browserify-devdupe is solely in existance to solve one problem: `npm dedupe` does not work with linked sub modules. 
 
 So **if you don't plan to use `npm link` or `ln -s`** in your development process **this is not for you** and you can stop
 reading now. At the same token if you are sure that all libraries that need to be deduped have the same version you will
-also not need this since **browserify@2.29.0 already dedupes modules with exact same file content**.
+also not need this since **browserify@2.29.0 or greater already dedupes modules with exact same file content**.
+
+## What it does
 
 While [dynamic-dedupe](https://github.com/thlorenz/dynamic-dedupe) solves dedupe breaking for server side modules as long as they have
-the exact same versions, **browserify-dedupe** does the same for modules bundled with browserify, except that it allows
-you to give a [dedupe-criteria](#criteria). Therefore if you need all your dependencies to always pull in exactly one
-instance of a library i.e. backbone, you can use **browserify-dedupe** to redirect all modules depending on older
+the exact same versions, browserify-devdupe does the same for modules bundled with browserify, except that it allows
+you to give a [dedupe-criteria](#criteria). 
+
+Therefore if you need all your dependencies to always pull in exactly one
+instance of a library i.e. backbone, you can use browserify-devdupe to redirect all modules depending on older
 versions to the latest common denominator.
 
 ```js
@@ -86,7 +90,7 @@ depends-1.0.0 - common common-1.0.0
 
 ## Installation
 
-    npm install browserify-dedupe
+    npm install browserify-devdupe
 
 ## API
 

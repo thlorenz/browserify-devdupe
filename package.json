@@ -1,5 +1,5 @@
 {
-  "name": "browserify-dedupe",
+  "name": "browserify-devdupe",
   "version": "0.0.0",
   "description": "Dedupes packages included in a browserify bundle according to a given criteria.",
   "main": "index.js",
@@ -12,9 +12,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/thlorenz/browserify-dedupe.git"
+    "url": "git://github.com/thlorenz/browserify-devdupe.git"
   },
-  "homepage": "https://github.com/thlorenz/browserify-dedupe",
+  "homepage": "https://github.com/thlorenz/browserify-devdupe",
   "dependencies": {
     "deduper": "~0.3.0",
     "through": "~2.3.4",
@@ -34,7 +34,7 @@
   },
   "license": {
     "type": "MIT",
-    "url": "https://github.com/thlorenz/browserify-dedupe/blob/master/LICENSE"
+    "url": "https://github.com/thlorenz/browserify-devdupe/blob/master/LICENSE"
   },
   "engine": {
     "node": ">=0.6"
