@@ -1,56 +1,92 @@
 'use strict';
-var Deduper = require('deduper');
-var browserify = require('browserify');
+
 var through = require('through');
+var Deduper = require('deduper');
+var resolve = require('resolve-redirects');
+var path = require('path');
 
-browserify().constructor.prototype.dedupeBundle = function (opts, cb) {
-  opts = opts || {};
-  var deduper = new Deduper();
-  var criteria = opts.dedupeCriteria || 'any';
-  var passThru = through();
-  var self = this;
+var deduper = new Deduper();
 
-  var deduping;
-  self
-    .on('package', function (file, pack) {
-      if (pack && Object.keys(pack).length) {
-        deduper.dedupe(criteria, file, pack);
-      }
-    })
-    .bundle(opts, function (err, res) {
-      if (deduping) return;
-      if (err) return console.error('error', err);
+function modulePath (fullPath) {
+  var parts = fullPath.split(path.sep);
+  var p, lastNodeModules;
 
-      deduping = true;
+  for (var i = 0; i < parts.length; i++) {
+    p = parts[i];
+    if (p === 'node_modules') lastNodeModules = i;
+  }
 
-      Object.keys(deduper.cache)
-        .forEach(function (k) {
-          var deps = deduper.cache[k];
-          var dep = deps[0];
-          if (deps.length > 1) {
-            var versions = deps.map(function (d) {
-              return d.pack.version;
-            }).join(', ');
-            return self.emit('cannot-dedupe', dep.pack.name, versions);
-          }
+  return parts.slice(0, lastNodeModules + 2).join(path.sep);
+}
 
-          self.require(dep.id, { expose: dep.pack.name });
-        });
+var go = module.exports = function (bfy, criteria) {
+  criteria = criteria || 'major';
+  var replaceDeps = {};
 
-      self.bundle(opts, cb).pipe(passThru);
-    });
+  bfy.on('package', function (file, pack) {
+    if (pack && Object.keys(pack).length) {
+      var dd = deduper.dedupe(criteria, file, pack);
+      
+      if (dd.replacesId) {
+        replaceDeps[dd.replacesId] = file;
+      } else if (
+          dd.id !== file 
 
-    return passThru;
+          // don't replace file from exact same package and with each other since the first seen one is the main file
+          // all other files from the same package are just dependents of that main file
+          && (modulePath(dd.id) !== modulePath(file)))
+        replaceDeps[file] = dd.id;
+      } 
+  });
+
+  function inspect(obj, depth) {
+    console.log(require('util').inspect(obj, false, depth || 5, true));
+  }
+
+  var bfy_deps = bfy.deps.bind(bfy);
+  bfy.deps = function () {
+    replaceDeps = {};
+
+    var deps = [];
+    var depStream = bfy_deps.apply(bfy, arguments);
+
+    return depStream.pipe(through(write, end));
+    
+    function write (d) { deps.push(d); }
+    function end () {
+      replaceDeps = resolve(replaceDeps);
+
+      deps.forEach(function (dep) {
+        // drop deps that have been replaced so they won't get bundled
+        if (replaceDeps[dep.id]) return;
+        
+        Object.keys(dep.deps).forEach(function (k) {
+          var current = dep.deps[k];
+          var replacement = replaceDeps[current];
+          if (replacement) dep.deps[k] = replacement;
+        })
+        this.queue(dep);
+      }.bind(this));
+
+      this.queue(null);
+    }
+  };
+
+  return bfy;
 };
 
+var browserify = require('browserify');
 var entry = require.resolve('./test/fixtures/');
-browserify()
+var bfy = browserify()
   .require(entry, { entry: true })
-  .on('cannot-dedupe', function (d, versions) { 
-    console.warn('cannot dedupe "%s" because I found incompatible versions: ', d, versions); 
-  })
-  .dedupeBundle({ dedupeCriteria: 'any' }, function (err, res) {
+  /*.bundle(function (err, res) {
+    if (err) return console.error(err);
     eval(res);
-  });
- /*.dedupeBundle()
- .pipe(process.stdout);*/
+   // console.log(res);
+  });*/
+
+go(bfy, 'any').bundle(function (err, res) {
+  if (err) return console.error(err);
+  eval(res);
+ // console.log(res);
+});
