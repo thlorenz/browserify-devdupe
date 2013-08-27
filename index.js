@@ -39,12 +39,9 @@ var go = module.exports = function (bfy, criteria) {
       } 
   });
 
-  function inspect(obj, depth) {
-    console.log(require('util').inspect(obj, false, depth || 5, true));
-  }
-
   var bfy_deps = bfy.deps.bind(bfy);
   bfy.deps = function () {
+    var self = this;
     replaceDeps = {};
 
     var deps = [];
@@ -58,7 +55,10 @@ var go = module.exports = function (bfy, criteria) {
 
       deps.forEach(function (dep) {
         // drop deps that have been replaced so they won't get bundled
-        if (replaceDeps[dep.id]) return;
+        if (replaceDeps[dep.id]) { 
+          self.emit('deduping', dep.id);
+          return;
+        }
         
         Object.keys(dep.deps).forEach(function (k) {
           var current = dep.deps[k];
@@ -74,19 +74,3 @@ var go = module.exports = function (bfy, criteria) {
 
   return bfy;
 };
-
-var browserify = require('browserify');
-var entry = require.resolve('./test/fixtures/');
-var bfy = browserify()
-  .require(entry, { entry: true })
-  /*.bundle(function (err, res) {
-    if (err) return console.error(err);
-    eval(res);
-   // console.log(res);
-  });*/
-
-go(bfy, 'any').bundle(function (err, res) {
-  if (err) return console.error(err);
-  eval(res);
- // console.log(res);
-});
