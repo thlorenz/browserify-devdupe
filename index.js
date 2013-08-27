@@ -4,9 +4,7 @@ var through = require('through');
 var Deduper = require('deduper');
 var resolve = require('resolve-redirects');
 var path = require('path');
-var Module = require('module');
 
-var deduper = new Deduper();
 
 function modulePath (fullPath) {
   var parts = fullPath.split(path.sep);
@@ -30,12 +28,21 @@ function isMain (file) {
   } catch (err) {
     return false;
   }
-
 }
 
+/**
+ * Adds deduping behavior based on the given criteria to the browserify instance.
+ * 
+ * @name exports
+ * @function
+ * @param bfy {Object} browserify instance (i.e. result of `browserify()`)
+ * @param criteria {String} exact | patch | minor | major | any 
+ * @return {Object} the browserify instance with added behavior
+ */
 var go = module.exports = function (bfy, criteria) {
-  criteria = criteria || 'major';
+  criteria = criteria || 'minor';
   var replaceDeps = {};
+  var deduper = new Deduper();
 
   bfy.on('package', function (file, pack) {
     if (pack && Object.keys(pack).length) {
