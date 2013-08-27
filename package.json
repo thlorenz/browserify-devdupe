@@ -17,7 +17,8 @@
   "homepage": "https://github.com/thlorenz/browserify-dedupe",
   "dependencies": {
     "deduper": "~0.3.0",
-    "through": "~2.3.4"
+    "through": "~2.3.4",
+    "resolve-redirects": "~0.1.0"
   },
   "devDependencies": {
     "nave": "~0.4.3",
