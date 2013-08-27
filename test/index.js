@@ -92,7 +92,7 @@ test('\nminor - loads 0.1.5, 0.2.0, 1.0.0 - not 0.1.0 and dedupes 0.1.0 wherever
   )
 })
 
-test('\nmajor - loads 0.2.0, 1.0.0 - not 0.1.0, 0.1.5  and dedupes 0.1.0 and 0.1.5 wherever referenced with 0.2.0', function (t) {
+test('\nmajor - loads 0.2.0, 1.0.0 - not 0.1.0, 0.1.5  and dedupes 0.1.0 and 0.1.5 wherever referenced with 0.2.0 - does not dedupe dep.js', function (t) {
   check(t
     , 'major'
     , [ 'loading common 0.2.0',
@@ -104,11 +104,11 @@ test('\nmajor - loads 0.2.0, 1.0.0 - not 0.1.0, 0.1.5  and dedupes 0.1.0 and 0.1
         'depends-1.0.0 - common common-1.0.0' ]
     , [ 'depends-0.1.0/node_modules/common/common.js',
         'also-depends-0.1.0/node_modules/common/common.js',
-        'depends-0.1.5/node_modules/common/common.js',
-        'depends-0.1.5/node_modules/common/dep.js' ]  )
+        'depends-0.1.5/node_modules/common/common.js' ]
+    )
 })
 
-test('\nany - loads 1.0.0 only and dedupes 0.1.0, 0.1.5, 0.2.0 wherever referenced with 1.0.0', function (t) {
+test('\nany - loads 1.0.0 only and dedupes 0.1.0, 0.1.5, 0.2.0 wherever referenced with 1.0.0 - does not dedupe dep.js', function (t) {
   check(t
     , 'any'
     , [ 'loading common 1.0.0',
@@ -120,7 +120,6 @@ test('\nany - loads 1.0.0 only and dedupes 0.1.0, 0.1.5, 0.2.0 wherever referenc
     , [ 'depends-0.1.0/node_modules/common/common.js',
         'depends-0.2.0/node_modules/common/common.js',
         'also-depends-0.1.0/node_modules/common/common.js',
-        'depends-0.1.5/node_modules/common/common.js',
-        'depends-0.1.5/node_modules/common/dep.js' ]  
+        'depends-0.1.5/node_modules/common/common.js' ]
     )
 })

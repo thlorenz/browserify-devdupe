@@ -4,6 +4,7 @@ var through = require('through');
 var Deduper = require('deduper');
 var resolve = require('resolve-redirects');
 var path = require('path');
+var Module = require('module');
 
 var deduper = new Deduper();
 
@@ -19,6 +20,19 @@ function modulePath (fullPath) {
   return parts.slice(0, lastNodeModules + 2).join(path.sep);
 }
 
+function isMain (file) {
+  var mp = modulePath(file);
+  try { 
+    var pack = require(path.join(mp, 'package.json'));
+    var main = pack.browser || pack.browserify || pack.main || 'index';
+    var resolved = path.resolve(mp, main);
+    return resolved === file;
+  } catch (err) {
+    return false;
+  }
+
+}
+
 var go = module.exports = function (bfy, criteria) {
   criteria = criteria || 'major';
   var replaceDeps = {};
@@ -29,12 +43,7 @@ var go = module.exports = function (bfy, criteria) {
       
       if (dd.replacesId) {
         replaceDeps[dd.replacesId] = file;
-      } else if (
-          dd.id !== file 
-
-          // don't replace file from exact same package and with each other since the first seen one is the main file
-          // all other files from the same package are just dependents of that main file
-          && (modulePath(dd.id) !== modulePath(file)))
+      } else if (dd.id !== file && isMain(file))
         replaceDeps[file] = dd.id;
       } 
   });

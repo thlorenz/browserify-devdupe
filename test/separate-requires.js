@@ -1,7 +1,7 @@
 'use strict';
 /*jshint asi: true */
 
-var debug// =  true;
+var debug //=  true;
 var test  =  debug  ? function () {} : require('tap').test
 var test_ =  !debug ? function () {} : require('tap').test
 
@@ -33,12 +33,12 @@ function check (t, criteria, entries, output, dedupes) {
       if (err) return t.fail(err);
       vm.runInNewContext(src, setup.ctx);
 
-      /*t.deepEqual(setup.buf, output, 'loads correct versions')
+      t.deepEqual(setup.buf, output, 'loads correct versions')
       t.equal(deduped.length, dedupes.length, 'correct number of dedupes')
-      deduped.forEach(function (d) { t.ok(~dedupes.indexOf(d), 'correct dedupe') })*/
+      deduped.forEach(function (d) { t.ok(~dedupes.indexOf(d), 'correct dedupe') })
 
-      inspect(setup.buf);
-      inspect(deduped);
+      /*inspect(setup.buf);
+      inspect(deduped);*/
       t.end()
     });
 }
@@ -50,7 +50,7 @@ test('\nrequireing two same version dependents - patch', function (t) {
       , require.resolve('./fixtures/also-depends-0.1.0')
       ]
     , [ 'loading common 0.1.0' ]
-    , [ 'depends-0.1.0/node_modules/common/common.js' ]
+    , [ 'also-depends-0.1.0/node_modules/common/common.js' ]
   )
 })
 
@@ -69,7 +69,7 @@ test('\nrequireing two dependents{0.1.0,0.1.5} - patch', function (t) {
     , [ require.resolve('./fixtures/depends-0.1.0')
       , require.resolve('./fixtures/depends-0.1.5')
       ]
-    , [ 'loading common 0.1.0',
+    , [ 'loading common 0.1.0'
       , 'loading common 0.1.5' ]
     , []
   )
@@ -99,7 +99,7 @@ test('\nrequireing three dependents{0.1.0,0.1.5,0.2.0} - minor', function (t) {
   )
 })
 
-test('\nrequireing three dependents{0.1.0,0.1.5,0.2.0} - major', function (t) {
+test('\nrequireing three dependents{0.1.0,0.1.5,0.2.0} - major - does not dedupe dep.js', function (t) {
   check(t
     , 'major'
     , [ require.resolve('./fixtures/depends-0.1.0')
@@ -108,9 +108,6 @@ test('\nrequireing three dependents{0.1.0,0.1.5,0.2.0} - major', function (t) {
       ]
    ,  [ 'loading common 0.2.0' ]
    ,  [ 'depends-0.1.0/node_modules/common/common.js',
-        'depends-0.1.5/node_modules/common/common.js',
-        // TODO: this is a bug that needs to be solved by looking at the actual main/browser{ify} field in the package
-        //       ensure that the deduped file is what it points at.
-        'depends-0.1.5/node_modules/common/dep.js' ]
+        'depends-0.1.5/node_modules/common/common.js' ]
   )
 })
